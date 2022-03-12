@@ -1,3 +1,17 @@
+## Causal Effect of Class Size on Average Student Math Performance
+
+In this project, I have tried to explore the causal question of whether or not class size which students learn effects the academic performance of students. The main focus is on the notion that smaller class sizes would cause better academic performance in math. Though, we will learn in this project that the data studied does not seem to support that causal relationship hypothesis at this time, but if we account for missing data and with further time, selection bias and such, then we may have better results.
+
+### How to run the provided code?
+
+Firstly, download the folder from GitHub and unzip it in your computer. Then, open (Anaconda) command prompt and create a virtual environnment. Here is a possible command conda create -n causal python=3.8. Then, cd into the directory .../classize/classize and run pip install -r requirements.txt to get the correct libraries donwloaded. Now, you may enter jupyter notebook to open a tab with a list of all the files in jupyter notebook. Finally, open the project_grade4.ipynb and project_grade5.ipynb to run the code. 
+
+You can remove this virtual environment by typing conda env remove -n _______ where __________ is the name you gave to your virtual enviornment. You can see that by doing conda env list.  
+
+
+
+###Below is the ReadMe for the data files used in this project. The ReadMe below does not belong to me. 
+
 Angrist and Lavy (1999)
 
 Using Maimonides' Rule to Estimate the Effect of Class Size on Student Achievement
