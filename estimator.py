@@ -60,7 +60,7 @@ def bootstrap(df, function, n=1000, ci=95, **kwargs):
     return confidence
 
 
-def backdoor(df, confounders=["towncode", "tipuach"], intervention="classize", outcome="avgmath"):
+def backdoor(df, confounders=["towncode", "tipuach"], intervention="classize", outcome="avgmath", print_ = False):
     """
     A backdoor adjustment  estimator for E[Y^a]
     Use smf.ols to train an outcome model E(Y | A, confounders)
@@ -83,30 +83,36 @@ def backdoor(df, confounders=["towncode", "tipuach"], intervention="classize", o
     # Use smf.ols to train an outcome model E(Y | A, confounders)
 
     results = []
-
+    actual = True
     # Create new model that will train to predict y and fit the model
     a_dim = [13, 26, 39, 52]
 
     # print(a_dim)  # should be 0,1,2,3,4,5
     prev = 0
     for a_ in a_dim:
-        # print("params are intercept, a_param, confounders  ", res.params)
+        
+        # "params are intercept, a_param, confounders  " for res.params
         # =1/n sum(i=1) to n ;model average of sum from 1 thru n
         subset = df[(df[intervention] <= a_) & (df[intervention] > prev)]
         prev = a_
-        #df[df[intervention] >= a_]
-        # print("subset ", subset)
         std = np.std(subset, axis=0)
-        #print("std", std)
 
         formula = outcome + " ~ + {}".format(" + ".join(confounders))
         # print("formula ", formula)
         model = smf.ols(
             formula=formula, data=subset)
-
+        
     # Use that model to predict E[Y] -> fit model with data and use it to predict given confounder
         res = model.fit()
-        #matching = df[["c", "d"]]
+         #this below conditional is only used so I can print what the variables are
+        if print_:
+            print("a is ", a_)
+            params = res.params
+            params_str = [float("{:.3f}".format(p)) for p in params]
+            print(f'Parameters: {params_str}')
+       
+      
+        #alternative for matching = df[["c", "d"]]
         data_dict = {}
         for c in confounders:
             data_dict[c] = df[c]
@@ -126,7 +132,7 @@ def backdoor(df, confounders=["towncode", "tipuach"], intervention="classize", o
     return np.array(results)
 
 
-def backdoorfeedback(df, confounders=["townid", "schlcode" "tipuach"], intervention="classize", outcome="avgmath"):
+def backdoorfeedback(df, confounders=["townid", "schlcode" "tipuach"], intervention="classize", outcome="avgmath", print_ = False):
     """
     This backdoor estimator has been adjusted for only 2 class sizes as per the provided feedback. 
     """
@@ -145,6 +151,7 @@ def backdoorfeedback(df, confounders=["townid", "schlcode" "tipuach"], intervent
     # print(a_dim)  # should be 0,1,2,3,4,5
     prev = 0
     for a_ in a_dim:
+        
         # print("params are intercept, a_param, confounders  ", res.params)
         # =1/n sum(i=1) to n ;model average of sum from 1 thru n
         subset = df[(df[intervention] <= a_) & (df[intervention] > prev)]
@@ -161,7 +168,11 @@ def backdoorfeedback(df, confounders=["townid", "schlcode" "tipuach"], intervent
 
     # Use that model to predict E[Y] -> fit model with data and use it to predict given confounder
         res = model.fit()
-        #matching = df[["c", "d"]]
+        if print_:
+            print("a is ", a_)
+            params = res.params
+            params_str = [float("{:.3f}".format(p)) for p in params]
+            print(f'Parameters: {params_str}')
         data_dict = {}
         for c in confounders:
             data_dict[c] = df[c]
